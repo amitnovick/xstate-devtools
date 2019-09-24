@@ -6,7 +6,7 @@
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' 'unsafe-eval' ; object-src 'self'",
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["hot-reload.js", "background.js"],
     "persistent": false
   },
   "icons": { "48": "assets/icon48.png", "128": "assets/icon128.png" },

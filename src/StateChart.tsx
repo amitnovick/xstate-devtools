@@ -323,7 +323,8 @@ export class StateChart extends React.Component<
         }}
       >
         <StateChartContainer service={service} onReset={() => this.reset()} />
-        <StyledSidebar>
+        <div style={{ backgroundColor: 'hotpink' }}>Placeholder</div>
+        {/* <StyledSidebar>
           <StyledViewTabs>
             {['definition', 'state', 'events'].map(view => {
               return (
@@ -338,7 +339,7 @@ export class StateChart extends React.Component<
             })}
           </StyledViewTabs>
           {this.renderView()}
-        </StyledSidebar>
+        </StyledSidebar> */}
       </StyledStateChart>
     );
   }
