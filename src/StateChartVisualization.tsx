@@ -18,10 +18,9 @@ export const StateChartVisualization: React.SFC<{
   service: Interpreter<any, any>;
   visible: boolean;
   onSelectService: (service: Interpreter<any>) => void;
-  onReset: () => void;
-}> = ({ service, visible, onSelectService, onReset }) => {
+}> = ({ service, visible, onSelectService }) => {
   const [transitionCount, setTransitionCount] = useState(0);
-  const [current, send] = useService(service);
+  const [current] = useService(service);
   const [state, setState] = React.useState<{
     [key: string]: any;
     preview?: State<any, any>;
@@ -135,26 +134,6 @@ export const StateChartVisualization: React.SFC<{
         transitionCount={transitionCount}
         level={0}
         preview={state.preview}
-        onReset={onReset}
-        onEvent={event => {
-          send(event);
-        }}
-        onPreEvent={event => {
-          if (!state.preview) {
-            setState({
-              ...state,
-              preview: service.nextState(event),
-              previewEvent: event
-            });
-          }
-        }}
-        onExitPreEvent={() => {
-          setState({
-            ...state,
-            preview: undefined,
-            previewEvent: undefined
-          });
-        }}
         onSelectServiceId={serviceId => {
           const s = (service as any).children.get(serviceId);
 

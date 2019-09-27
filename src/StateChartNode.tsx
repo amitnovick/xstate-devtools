@@ -16,7 +16,6 @@ import {
 import { EventName } from './EventName';
 import { tracker } from './tracker';
 import { getEdges } from 'xstate/lib/graph';
-import { StyledButton } from './Button';
 import { actionTypes } from 'xstate/lib/actions';
 import { StateChartAction } from './StateChartAction';
 import { StateChartGuard } from './StateChartGuard';
@@ -449,10 +448,6 @@ interface StateChartNodeProps {
   stateNode: StateNode;
   current: State<any, any>;
   preview?: State<any, any>;
-  onEvent: (event: string) => void;
-  onPreEvent: (event: string) => void;
-  onExitPreEvent: () => void;
-  onReset?: () => void;
   onSelectServiceId: (serviceId: string) => void;
   toggledStates: Record<string, boolean>;
   transitionCount: number;
@@ -484,10 +479,6 @@ export class StateChartNode extends React.Component<StateChartNodeProps, StateCh
       stateNode,
       current,
       preview,
-      onEvent,
-      onPreEvent,
-      onExitPreEvent,
-      onReset
     } = this.props;
     const isActive =
       !stateNode.parent ||
@@ -530,15 +521,6 @@ export class StateChartNode extends React.Component<StateChartNodeProps, StateCh
           >
             {dataType === 'history' && <StyledToken>H</StyledToken>}
             <strong title={`#${stateNode.id}`}>{stateNode.key}</strong>
-            {stateNode.path.length === 0 ? (
-              <StyledButton
-                data-variant="link"
-                onClick={onReset ? () => onReset() : undefined}
-                title="Reset machine to its initial state"
-              >
-                Reset
-              </StyledButton>
-            ) : null}
           </StyledStateNodeHeader>
           {!!stateActions(stateNode).length && (
             <>
@@ -594,9 +576,6 @@ export class StateChartNode extends React.Component<StateChartNodeProps, StateCh
                     current={current}
                     preview={preview}
                     key={childStateNode.id}
-                    onEvent={onEvent}
-                    onPreEvent={onPreEvent}
-                    onExitPreEvent={onExitPreEvent}
                     toggledStates={this.props.toggledStates}
                     onSelectServiceId={this.props.onSelectServiceId}
                     transitionCount={this.props.transitionCount}
@@ -664,11 +643,6 @@ export class StateChartNode extends React.Component<StateChartNodeProps, StateCh
                 data-internal={edge.transition.internal || undefined}
               >
                 <StyledEventButton
-                  onClick={() =>
-                    !isBuiltInEvent ? onEvent(ownEvent) : undefined
-                  }
-                  onMouseOver={() => onPreEvent(ownEvent)}
-                  onMouseOut={() => onExitPreEvent()}
                   disabled={disabled}
                   data-delay={
                     (edge.transition as DelayedTransitionDefinition<any, any>)

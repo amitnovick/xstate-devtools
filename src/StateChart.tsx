@@ -112,7 +112,6 @@ export const StyledStateChart = styled.div`
 interface StateChartProps {
   className?: string;
   machine: StateNode<any> | string;
-  onSave: (machineString: string) => void;
   height?: number | string;
 }
 
@@ -125,7 +124,7 @@ export interface StateChartState {
   current: State<any, any>;
   preview?: State<any, any>;
   previewEvent?: string;
-  view: string; //"definition" | "state";
+  view: string; // "state" | "events"
   code: string;
   toggledStates: Record<string, boolean>;
   service: Interpreter<any>;
@@ -194,7 +193,7 @@ export class StateChart extends React.Component<
       current: machine.initialState,
       preview: undefined,
       previewEvent: undefined,
-      view: 'definition', // or 'state'
+      view: 'state',
       machine: machine,
       code:
         typeof this.props.machine === 'string'
@@ -227,26 +226,10 @@ export class StateChart extends React.Component<
   componentDidMount() {
     this.state.service.start();
   }
-  componentDidUpdate(prevProps: StateChartProps) {
-    const { machine } = this.props;
-
-    if (machine !== prevProps.machine) {
-      this.updateMachine(machine.toString());
-    }
-  }
   renderView() {
     const { view, current, code, service, events } = this.state;
-    const { onSave } = this.props;
 
     switch (view) {
-      case 'definition':
-        return (
-          <CodePanel
-            code={code}
-            onChange={code => this.updateMachine(code)}
-            onSave={onSave}
-          />
-        );
       case 'state':
         return <StatePanel state={current} service={service} />;
       case 'events':
@@ -257,59 +240,7 @@ export class StateChart extends React.Component<
         return null;
     }
   }
-  updateMachine(code: string) {
-    let machine: StateNode;
-
-    try {
-      machine = toMachine(code);
-      getEdges(machine);
-    } catch (e) {
-      notificationsActor.notify({
-        message: 'Failed to update machine',
-        severity: 'error',
-        description: e.message
-      });
-      console.error(e);
-      return;
-    }
-
-    this.reset(code, machine);
-  }
-  reset(code = this.state.code, machine = this.state.machine) {
-    this.state.service.stop();
-    this.setState(
-      {
-        code,
-        machine,
-        events: [],
-        current: machine.initialState
-      },
-      () => {
-        this.setState(
-          {
-            service: interpret(this.state.machine)
-              .onTransition(current => {
-                this.handleTransition(current);
-                // TODO: fix events
-                // this.setState({ current, events: [] }, () => {
-                //   if (this.state.previewEvent) {
-                //     this.setState({
-                //       preview: this.state.service.nextState(
-                //         this.state.previewEvent
-                //       )
-                //     });
-                //   }
-                // });
-              })
-              .start()
-          },
-          () => {
-            console.log(this.state.service);
-          }
-        );
-      }
-    );
-  }
+  
   render() {
     const { className } = this.props;
     const { code, service } = this.state;
@@ -322,7 +253,7 @@ export class StateChart extends React.Component<
           background: 'var(--color-app-background)'
         }}
       >
-        <StateChartContainer service={service} onReset={() => this.reset()} />
+        <StateChartContainer service={service} />
         <div style={{ backgroundColor: 'hotpink' }}>Placeholder</div>
         {/* <StyledSidebar>
           <StyledViewTabs>

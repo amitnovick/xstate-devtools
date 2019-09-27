@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 interface StateChartContainerProps {
   service: Interpreter<any, any>;
-  onReset: () => void;
 }
 
 export const StyledStateChartContainer = styled.section`
@@ -21,7 +20,6 @@ export const StyledStateChartContainer = styled.section`
 
 export const StateChartContainer: React.SFC<StateChartContainerProps> = ({
   service,
-  onReset
 }) => {
   return (
     <StyledStateChartContainer>
@@ -29,7 +27,6 @@ export const StateChartContainer: React.SFC<StateChartContainerProps> = ({
         service={service}
         visible={true}
         onSelectService={() => void 0}
-        onReset={onReset}
       />
     </StyledStateChartContainer>
   );
