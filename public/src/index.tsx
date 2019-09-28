@@ -4,9 +4,12 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import queryString from 'query-string';
-import { DH_CHECK_P_NOT_PRIME } from 'constants';
+import { Machine, State } from 'xstate';
 
-let bgConnection;
+let backgroundPort;
+
+let machine;
+let state;
 
 const renderDevTools = () => {
   const query = queryString.parse(window.location.search);
@@ -15,7 +18,10 @@ const renderDevTools = () => {
     window.opener.authCallback(query.code);
     setTimeout(() => window.close());
   } else {
-    ReactDOM.render(<App />, document.getElementById('root'));
+    ReactDOM.render(
+      <App machine={machine} state={state} />,
+      document.getElementById('root')
+    );
 
     // If you want your app to work offline and load faster, you can change
     // unregister() to register() below. Note this comes with some pitfalls.
@@ -26,16 +32,31 @@ const renderDevTools = () => {
 
 const init = () => {
   const tabId = chrome.devtools.inspectedWindow.tabId.toString();
-  bgConnection = chrome.runtime.connect({ name: tabId });
+  backgroundPort = chrome.runtime.connect({ name: tabId });
   console.log(`Opened port with 'runtime.connect'`);
-  bgConnection.onMessage.addListener(message => {
+  backgroundPort.onMessage.addListener(message => {
     console.log('---<message>---');
     console.log(
       `Devtools: @'xstate-viz/public/src/index.tsx': got message: `,
       message
     );
-    renderDevTools();
     console.log('---</message>---');
+
+    const { type } = message;
+    switch (type) {
+      case 'connect': {
+        const { machine: m, state: s } = message.payload;
+        machine = Machine(JSON.parse(m));
+        state = State.create(JSON.parse(s));
+        renderDevTools();
+        return;
+      }
+      case 'update': {
+        const { state: s } = message.payload;
+        state = State.create(JSON.parse(s));
+        return;
+      }
+    }
   });
 };
 

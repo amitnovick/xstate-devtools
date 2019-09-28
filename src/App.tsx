@@ -1,10 +1,7 @@
 import React, { Component, createContext, useState, useReducer } from 'react';
 import { StateChart } from './index';
 import styled from 'styled-components';
-import { Machine, assign, EventObject, State, Interpreter } from 'xstate';
 import queryString from 'query-string';
-import { useMachine } from '@xstate/react';
-import { log, send } from 'xstate/lib/actions';
 
 import { examples } from './examples';
 import { Logo } from './logo';
@@ -113,28 +110,7 @@ interface AppMachineContext {
 
 const query = queryString.parse(window.location.search);
 
-const appMachine = Machine<AppMachineContext>({
-  id: 'app',
-  context: {
-    machine: examples.basic
-  },
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        UPDATE_MACHINE_STATE: {
-          actions: 'updateMachineState'
-        }
-      }
-    }
-  }
-});
-
-export const AppContext = createContext<{
-  state: State<AppMachineContext>;
-  send: (event: any) => void;
-  service: Interpreter<AppMachineContext>;
-}>({ state: appMachine.initialState, send: () => {}, service: {} as any });
+export const AppContext = createContext(null);
 
 function layoutReducer(state: string, event: string) {
   switch (state) {
@@ -157,8 +133,7 @@ function layoutReducer(state: string, event: string) {
   }
 }
 
-export function App() {
-  const [current, send, service] = useMachine(appMachine);
+export function App({ machine, state }) {
   const [layout, dispatchLayout] = useReducer(
     layoutReducer,
     (query.layout as string) || (!!query.embed ? 'viz' : 'full')
@@ -166,19 +141,12 @@ export function App() {
 
   return (
     <StyledApp data-layout={layout} data-embed={query.embed}>
-      <AppContext.Provider value={{ state: current, send, service }}>
-        {current.matches({ gist: 'fetching' }) ? (
-          <Loader />
-        ) : (
-          <>
-            <StateChart machine={current.context.machine} />
-            <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
-              {({ full: 'Hide', viz: 'Code' } as Record<string, string>)[
-                layout
-              ] || 'Show'}
-            </LayoutButton>
-          </>
-        )}
+      <AppContext.Provider value={{ state: state }}>
+        <StateChart machine={machine} />
+        <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
+          {({ full: 'Hide', viz: 'Code' } as Record<string, string>)[layout] ||
+            'Show'}
+        </LayoutButton>
       </AppContext.Provider>
     </StyledApp>
   );

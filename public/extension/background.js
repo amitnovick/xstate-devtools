@@ -10,13 +10,21 @@ chrome.runtime.onConnect.addListener(panelPort => {
     `Background: got message on 'runtime.onConnect' from tabId:`,
     tabId
   );
-  inspectedWindowTabs[tabId] = panelPort;
-  console.log('Updated panelsPorts:', inspectedWindowTabs);
-  panelPort.postMessage({
-    payload: tabs[tabId]
-  });
-  console.log('Sent message to panel');
   console.log('---</message>---');
+  inspectedWindowTabs[tabId] = panelPort;
+  console.log('Updated inspectedWindowTabs:', inspectedWindowTabs);
+  if (tabId in tabs) {
+    const { machine, state } = tabs[tabId];
+
+    panelPort.postMessage({
+      type: 'connect',
+      payload: {
+        machine: machine,
+        state: state
+      }
+    });
+    console.log('Sent message to panel');
+  }
 
   // // push every port connected to the ports array
   // portsArr.push(port);
@@ -35,19 +43,46 @@ chrome.runtime.onConnect.addListener(panelPort => {
 });
 
 // background.js recieves message from content page and forwards it to devTools page
-chrome.runtime.onMessage.addListener((request, sender) => {
+chrome.runtime.onMessage.addListener((message, sender) => {
   console.log('---<message>---');
-  console.log(`Background: got message on 'runtime'`, request);
-  const tabId = sender.tab.id;
-  const data = request;
-  tabs[tabId] = data;
+  console.log(`Background: got message on 'runtime'`, message);
   console.log('Updated tabs:', tabs);
   console.log('---</message>---');
-  if (tabId in inspectedWindowTabs) {
-    inspectedWindowTabs[tabId].postMessage({
-      // TODO: this payload should be the machine state
-      payload: tabs[tabId]
-    });
+
+  const { id: tabId } = sender.tab;
+  const { type } = message;
+  // eslint-disable-next-line default-case
+  switch (type) {
+    case 'connect': {
+      const { machine, state } = message.payload;
+      tabs[tabId] = {
+        machine: machine,
+        state: state
+      };
+      if (tabId in inspectedWindowTabs) {
+        inspectedWindowTabs[tabId].postMessage({
+          type: 'connect',
+          payload: {
+            machine: machine,
+            state: state
+          }
+        });
+      }
+      return;
+    }
+    case 'update': {
+      const { state } = message.payload;
+      tabs[tabId].state = state;
+      if (tabId in inspectedWindowTabs) {
+        inspectedWindowTabs[tabId].postMessage({
+          type: 'update',
+          payload: {
+            state: state
+          }
+        });
+      }
+      return;
+    }
   }
 
   // const { type } = request;

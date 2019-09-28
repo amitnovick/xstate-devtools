@@ -9,8 +9,9 @@
     "@types/node": "10.12.1",
     "@xstate/react": "^0.6.1",
     "query-string": "^6.8.0",
-    "react-scripts": "^3.0.1",
-    "styled-components": "^4.2.0"
+    "react-scripts": "^3.1.2",
+    "styled-components": "^4.2.0",
+    "xstate": "^4.6.7"
   },
   "scripts": {
     "watch": "cra-build-watch --verbose --build-path=extension/devtools/build",

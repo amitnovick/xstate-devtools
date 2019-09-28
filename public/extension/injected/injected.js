@@ -1,13 +1,21 @@
 const __XSTATE_DEVTOOLS_EXTENSION__ = {
-  connect: () => {
+  connect: ({ machine, state }) => {
     window.postMessage({
-      type: 'APP_CONNECTED_TO_DEVTOOLS'
+      type: 'connect',
+      payload: {
+        machine: machine,
+        state: state
+      }
     });
 
     return {
-      init: () => {},
-      send: () => {
-        window.postMessage({});
+      send: state => {
+        window.postMessage({
+          type: 'update',
+          payload: {
+            state: state
+          }
+        });
       }
     };
   }
