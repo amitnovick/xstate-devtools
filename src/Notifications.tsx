@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Machine, assign, State, actions } from 'xstate';
 import { Actor } from 'xstate/lib/Actor';
 import { produce } from 'immer';
-import { useMachine } from '@xstate/react';
 import { log } from 'xstate/lib/actions';
 import styled from 'styled-components';
-import { notificationsActor } from './Header';
 
 export interface Notification {
   message: string;
@@ -165,12 +163,6 @@ export const Notifications: React.FunctionComponent<NotificationsProps> = ({
               '--timeout': 5000,
               '--index': i
             }}
-            onClick={() =>
-              notificationsActor.send({
-                type: 'NOTIFICATION.DISMISS',
-                index: i
-              })
-            }
           >
             <strong>{notification.message}</strong>
             {notification.description && (

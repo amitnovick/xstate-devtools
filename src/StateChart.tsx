@@ -9,15 +9,12 @@ import {
   assign,
   send,
   spawn,
-  interpret,
-  Interpreter,
   StateMachine
 } from 'xstate';
 import * as XState from 'xstate';
 import { StateChartContainer, StyledStateChartContainer } from './VizTabs';
 import { StatePanel } from './StatePanel';
 import { EventPanel } from './EventPanel';
-import { CodePanel } from './CodePanel';
 import { raise } from 'xstate/lib/actions';
 import { getEdges } from 'xstate/lib/graph';
 import { notificationsActor } from './Header';
@@ -127,59 +124,8 @@ export interface StateChartState {
   view: string; // "state" | "events"
   code: string;
   toggledStates: Record<string, boolean>;
-  service: Interpreter<any>;
   error?: any;
   events: Array<EventRecord>;
-}
-
-export function toMachine(machine: StateNode<any> | string): StateNode<any> {
-  if (typeof machine !== 'string') {
-    return machine;
-  }
-
-  let createMachine: Function;
-  try {
-    createMachine = new Function(
-      'Machine',
-      'interpret',
-      'assign',
-      'send',
-      'sendParent',
-      'spawn',
-      'raise',
-      'actions',
-      'XState',
-      machine
-    );
-  } catch (e) {
-    throw e;
-  }
-
-  const machines: Array<StateNode<any>> = [];
-
-  const machineProxy = (config: any, options: any) => {
-    const machine = Machine(config, options);
-    machines.push(machine);
-    return machine;
-  };
-
-  try {
-    createMachine(
-      machineProxy,
-      interpret,
-      assign,
-      send,
-      XState.sendParent,
-      spawn,
-      raise,
-      XState.actions,
-      XState
-    );
-  } catch (e) {
-    throw e;
-  }
-
-  return machines[machines.length - 1]! as StateNode<any>;
 }
 
 export class StateChart extends React.Component<
@@ -187,7 +133,7 @@ export class StateChart extends React.Component<
   StateChartState
 > {
   state: StateChartState = (() => {
-    const machine = toMachine(this.props.machine);
+    const machine = this.props.machine;
 
     return {
       current: machine.initialState,
@@ -200,9 +146,6 @@ export class StateChart extends React.Component<
           ? this.props.machine
           : `Machine(${JSON.stringify(machine.config, null, 2)})`,
       toggledStates: {},
-      service: interpret(machine, {}).onTransition(current => {
-        this.handleTransition(current);
-      }),
       events: []
     };
   })();
@@ -213,37 +156,14 @@ export class StateChart extends React.Component<
     };
     this.setState(
       { current: state, events: this.state.events.concat(formattedEvent) },
-      () => {
-        if (this.state.previewEvent) {
-          // this.setState({
-          //   preview: this.state.service.nextState(this.state.previewEvent)
-          // });
-        }
-      }
+      () => {}
     );
   }
   svgRef = React.createRef<SVGSVGElement>();
-  componentDidMount() {
-    this.state.service.start();
-  }
-  renderView() {
-    const { view, current, code, service, events } = this.state;
 
-    switch (view) {
-      case 'state':
-        return <StatePanel state={current} service={service} />;
-      case 'events':
-        return (
-          <EventPanel state={current} service={service} records={events} />
-        );
-      default:
-        return null;
-    }
-  }
-  
   render() {
     const { className } = this.props;
-    const { code, service } = this.state;
+    const { code } = this.state;
 
     return (
       <StyledStateChart
@@ -253,7 +173,7 @@ export class StateChart extends React.Component<
           background: 'var(--color-app-background)'
         }}
       >
-        <StateChartContainer service={service} />
+        <StateChartContainer />
         <div style={{ backgroundColor: 'hotpink' }}>Placeholder</div>
         {/* <StyledSidebar>
           <StyledViewTabs>

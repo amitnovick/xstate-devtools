@@ -54,6 +54,7 @@ const init = () => {
       case 'update': {
         const { state: s } = message.payload;
         state = State.create(JSON.parse(s));
+        renderDevTools();
         return;
       }
     }

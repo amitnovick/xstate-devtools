@@ -3,11 +3,9 @@ import { StateChart } from './index';
 import styled from 'styled-components';
 import queryString from 'query-string';
 
-import { examples } from './examples';
 import { Logo } from './logo';
-import { Loader } from './Loader';
 import { LayoutButton, StyledLayoutButton } from './LayoutButton';
-import { toMachine } from './StateChart';
+import AppContext from './AppContext';
 
 export const StyledHeader = styled.header`
   display: flex;
@@ -99,18 +97,11 @@ export const StyledLinks = styled.nav`
   }
 `;
 
-interface GithubUser {
-  login: string;
-  avatar_url: string;
-}
-
-interface AppMachineContext {
-  machine: any;
-}
+// interface AppMachineContext {
+//   machine: any;
+// }
 
 const query = queryString.parse(window.location.search);
-
-export const AppContext = createContext(null);
 
 function layoutReducer(state: string, event: string) {
   switch (state) {
@@ -133,7 +124,9 @@ function layoutReducer(state: string, event: string) {
   }
 }
 
-export function App({ machine, state }) {
+export function App({ machine, state }: { machine: any; state: any }) {
+  console.log('xstate-viz/src/App.tsx: App: machine:', machine);
+  console.log('xstate-viz/src/App.tsx: App: state:', state);
   const [layout, dispatchLayout] = useReducer(
     layoutReducer,
     (query.layout as string) || (!!query.embed ? 'viz' : 'full')
@@ -141,7 +134,7 @@ export function App({ machine, state }) {
 
   return (
     <StyledApp data-layout={layout} data-embed={query.embed}>
-      <AppContext.Provider value={{ state: state }}>
+      <AppContext.Provider value={{ machine: machine, state: state }}>
         <StateChart machine={machine} />
         <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
           {({ full: 'Hide', viz: 'Code' } as Record<string, string>)[layout] ||

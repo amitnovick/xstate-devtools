@@ -1,9 +1,17 @@
 // listening for messages from npm package
 window.addEventListener('message', msg => {
   const { type } = msg.data;
-  if (type === 'connect') {
-    console.log(`Content: got message on 'window':`, msg.data);
-    chrome.runtime.sendMessage(msg.data);
+  switch (type) {
+    case 'connect': {
+      console.log(`Content: got 'connect' message on 'window':`, msg.data);
+      chrome.runtime.sendMessage(msg.data);
+      return;
+    }
+    case 'update': {
+      console.log(`Content: got 'update' message on 'window':`, msg.data);
+      chrome.runtime.sendMessage(msg.data);
+      return;
+    }
   }
   // // window listener picks up the message it sends, so we should filter
   // // messages sent by contentscript

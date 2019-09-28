@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { getEdges } from 'xstate/lib/graph';
-import { serializeEdge, initialStateNodes } from './utils';
+import { State, Interpreter } from 'xstate';
+
 import { Edge } from './Edge';
 import { InitialEdge } from './InitialEdge';
+import { serializeEdge, initialStateNodes } from './utils';
 import { StateChartNode } from './StateChartNode';
-import { State, Interpreter } from 'xstate';
-import { useService } from '@xstate/react';
+import AppContext from './AppContext';
 
 const StyledVisualization = styled.div`
   position: relative;
@@ -15,12 +16,9 @@ const StyledVisualization = styled.div`
 `;
 
 export const StateChartVisualization: React.SFC<{
-  service: Interpreter<any, any>;
   visible: boolean;
-  onSelectService: (service: Interpreter<any>) => void;
-}> = ({ service, visible, onSelectService }) => {
+}> = ({ visible }) => {
   const [transitionCount, setTransitionCount] = useState(0);
-  const [current] = useService(service);
   const [state, setState] = React.useState<{
     [key: string]: any;
     preview?: State<any, any>;
@@ -29,11 +27,12 @@ export const StateChartVisualization: React.SFC<{
     previewEvent: undefined,
     preview: undefined
   });
+  const { state, machine } = React.useContext(AppContext);
   const svgRef = React.useRef<SVGSVGElement>(null);
   let edges: ReturnType<typeof getEdges> | null;
 
   try {
-    edges = getEdges(service.machine);
+    edges = getEdges(machine);
   } catch (err) {
     edges = null;
     console.error(err);
@@ -41,7 +40,7 @@ export const StateChartVisualization: React.SFC<{
 
   useEffect(() => {
     setTransitionCount(transitionCount + 1);
-  }, [current]);
+  }, [state]);
 
   if (!visible || !edges) {
     return null;
@@ -102,14 +101,14 @@ export const StateChartVisualization: React.SFC<{
               edge={edge}
               preview={
                 edge.event === state.previewEvent &&
-                current.matches(edge.source.path.join('.')) &&
+                state.matches(edge.source.path.join('.')) &&
                 !!state.preview &&
                 state.preview.matches(edge.target.path.join('.'))
               }
             />
           );
         })}
-        {initialStateNodes(service.machine).map((initialStateNode, i) => {
+        {initialStateNodes(machine).map((initialStateNode, i) => {
           if (!svgRef.current) {
             return;
           }
@@ -120,7 +119,7 @@ export const StateChartVisualization: React.SFC<{
               source={initialStateNode}
               svgRef={svgRef.current}
               preview={
-                current.matches(initialStateNode.path.join('.')) ||
+                state.matches(initialStateNode.path.join('.')) ||
                 (!!state.preview &&
                   state.preview.matches(initialStateNode.path.join('.')))
               }
@@ -129,18 +128,12 @@ export const StateChartVisualization: React.SFC<{
         })}
       </svg>
       <StateChartNode
-        stateNode={service.machine}
-        current={service.state}
+        stateNode={machine}
+        current={state}
         transitionCount={transitionCount}
         level={0}
         preview={state.preview}
-        onSelectServiceId={serviceId => {
-          const s = (service as any).children.get(serviceId);
-
-          if (s) {
-            onSelectService(s); // TODO: pass service via context
-          }
-        }}
+        onSelectServiceId={serviceId => {}}
         toggledStates={state.toggledStates}
       />
     </StyledVisualization>

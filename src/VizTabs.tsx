@@ -3,9 +3,7 @@ import { Interpreter, Machine } from 'xstate';
 import { StateChartVisualization } from './StateChartVisualization';
 import styled from 'styled-components';
 
-interface StateChartContainerProps {
-  service: Interpreter<any, any>;
-}
+interface StateChartContainerProps {}
 
 export const StyledStateChartContainer = styled.section`
   display: grid;
@@ -18,16 +16,12 @@ export const StyledStateChartContainer = styled.section`
   }
 `;
 
-export const StateChartContainer: React.SFC<StateChartContainerProps> = ({
-  service,
-}) => {
+export const StateChartContainer: React.SFC<
+  StateChartContainerProps
+> = ({}) => {
   return (
     <StyledStateChartContainer>
-      <StateChartVisualization
-        service={service}
-        visible={true}
-        onSelectService={() => void 0}
-      />
+      <StateChartVisualization visible={true} />
     </StyledStateChartContainer>
   );
 };

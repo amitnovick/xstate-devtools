@@ -10,9 +10,14 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "lib": ["dom", "es7"],
+    "lib": [
+      "dom",
+      "es7"
+    ],
     "outDir": "./lib",
     "declaration": true
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
