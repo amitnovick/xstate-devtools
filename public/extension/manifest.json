@@ -13,7 +13,8 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content/contentCommunicate.js", "content/contentInject.js"]
+      "js": ["content/contentCommunicate.js", "content/contentInject.js"],
+      "run_at": "document_start"
     }
   ],
   "web_accessible_resources": ["injected/injected.js"],

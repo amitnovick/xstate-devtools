@@ -4,7 +4,7 @@ let tabs = {}; // Map with keys of tabIds and value as xstate machine data
 
 // establishing connection with devtools
 chrome.runtime.onConnect.addListener(panelPort => {
-  const tabId = panelPort.name;
+  const { name: tabId } = panelPort;
   console.log('---<message>---');
   console.log(
     `Background: got message on 'runtime.onConnect' from tabId:`,
@@ -13,6 +13,7 @@ chrome.runtime.onConnect.addListener(panelPort => {
   console.log('---</message>---');
   inspectedWindowTabs[tabId] = panelPort;
   console.log('Updated inspectedWindowTabs:', inspectedWindowTabs);
+  console.log('tabs:', tabs);
   if (tabId in tabs) {
     const { machine, state } = tabs[tabId];
 

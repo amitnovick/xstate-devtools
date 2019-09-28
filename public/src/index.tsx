@@ -48,6 +48,14 @@ const init = () => {
         const { machine: m, state: s } = message.payload;
         machine = Machine(JSON.parse(m));
         state = State.create(JSON.parse(s));
+        console.log(
+          'stringState:',
+          s,
+          'parsedState:',
+          JSON.parse(s),
+          'createdState:',
+          state
+        );
         renderDevTools();
         return;
       }

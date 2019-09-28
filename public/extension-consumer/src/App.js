@@ -2,8 +2,7 @@
 import React from 'react';
 import './App.css';
 import { Machine, assign } from 'xstate';
-
-let devtools;
+import { useMachine } from '@xstate/react';
 
 const machine = Machine({
   id: 'fetch',
@@ -39,22 +38,23 @@ const machine = Machine({
   }
 });
 
-setTimeout(() => {
-  console.log('machine before sending:', machine);
-  devtools = window.__XSTATE_DEVTOOLS_EXTENSION__.connect({
-    machine: JSON.stringify(machine.config),
-    state: JSON.stringify(machine.initialState)
-  });
-}, 1000);
-
-setTimeout(() => {
-  const nextState = machine.transition(machine.initialState, 'FETCH');
-  console.log('nextState before sending:', nextState);
-  devtools.send(JSON.stringify(nextState));
-}, 20000);
-
 function App() {
-  return <h2>Extension Consumer</h2>;
+  const [state, send] = useMachine(machine, {
+    devTools: true
+  });
+  console.log('App State:', state);
+  console.log('App State string:', JSON.stringify(state));
+
+  if (state.matches('idle')) {
+    return (
+      <div>
+        <h2>Idle</h2>
+        <button onClick={() => send('FETCH')}>FETCH</button>
+      </div>
+    );
+  } else {
+    return <h2>Non-idle state</h2>;
+  }
 }
 
 export default App;
