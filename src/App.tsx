@@ -125,8 +125,6 @@ function layoutReducer(state: string, event: string) {
 }
 
 export function App({ machine, state }: { machine: any; state: any }) {
-  console.log('xstate-viz/src/App.tsx: App: machine:', machine);
-  console.log('xstate-viz/src/App.tsx: App: state:', state);
   const [layout, dispatchLayout] = useReducer(
     layoutReducer,
     (query.layout as string) || (!!query.embed ? 'viz' : 'full')

@@ -455,10 +455,13 @@ interface StateChartNodeProps {
 }
 
 interface StateChartNodeState {
-  toggled: boolean
+  toggled: boolean;
 }
 
-export class StateChartNode extends React.Component<StateChartNodeProps, StateChartNodeState> {
+export class StateChartNode extends React.Component<
+  StateChartNodeProps,
+  StateChartNodeState
+> {
   constructor(props: StateChartNodeProps) {
     super(props);
 
@@ -468,18 +471,13 @@ export class StateChartNode extends React.Component<StateChartNodeProps, StateCh
     this.state = { toggled };
   }
 
-
   stateRef = React.createRef<any>();
 
   public componentDidUpdate() {
     tracker.update(this.props.stateNode.id, this.stateRef.current);
   }
   public render(): JSX.Element {
-    const {
-      stateNode,
-      current,
-      preview,
-    } = this.props;
+    const { stateNode, current, preview } = this.props;
     const isActive =
       !stateNode.parent ||
       current.matches(stateNode.path.join('.')) ||
@@ -589,10 +587,13 @@ export class StateChartNode extends React.Component<StateChartNodeProps, StateCh
               title={this.state.toggled ? 'Hide children' : 'Show children'}
               onClick={e => {
                 e.stopPropagation();
-                
+
                 // remember toggled value
                 const toggled = !this.state.toggled;
-                localStorage.setItem(`${stateNode.id}_toggled`, toggled ? '1' : '');
+                localStorage.setItem(
+                  `${stateNode.id}_toggled`,
+                  toggled ? '1' : ''
+                );
 
                 this.setState({ toggled }, () => {
                   tracker.updateAll();

@@ -174,7 +174,7 @@ export class StateChart extends React.Component<
         }}
       >
         <StateChartContainer />
-        <div style={{ backgroundColor: 'hotpink' }}>Placeholder</div>
+        <div style={{ backgroundColor: 'hotpink', visibility: 'hidden' }}>Placeholder</div>
         {/* <StyledSidebar>
           <StyledViewTabs>
             {['definition', 'state', 'events'].map(view => {
