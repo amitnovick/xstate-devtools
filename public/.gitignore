@@ -22,4 +22,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-extension/devtools/build
+/extension/devtools/build
+
+extension.zip

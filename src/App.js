@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import queryString from 'query-string';
 
 import { Logo } from './logo';
-import { LayoutButton, StyledLayoutButton } from './LayoutButton';
+import { StyledLayoutButton } from './LayoutButton';
 import AppContext from './AppContext';
 
 export const StyledHeader = styled.header`
@@ -97,47 +97,15 @@ export const StyledLinks = styled.nav`
   }
 `;
 
-// interface AppMachineContext {
-//   machine: any;
-// }
-
 const query = queryString.parse(window.location.search);
 
-function layoutReducer(state: string, event: string) {
-  switch (state) {
-    case 'full':
-      switch (event) {
-        case 'TOGGLE':
-          return 'viz';
-        default:
-          return state;
-      }
-    case 'viz':
-      switch (event) {
-        case 'TOGGLE':
-          return 'full';
-        default:
-          return state;
-      }
-    default:
-      return state;
-  }
-}
+const layout = 'viz';
 
-export function App({ machine, state }: { machine: any; state: any }) {
-  const [layout, dispatchLayout] = useReducer(
-    layoutReducer,
-    (query.layout as string) || (!!query.embed ? 'viz' : 'full')
-  );
-
+export function App({ machine, state }) {
   return (
     <StyledApp data-layout={layout} data-embed={query.embed}>
       <AppContext.Provider value={{ machine: machine, state: state }}>
-        <StateChart machine={machine} />
-        <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
-          {({ full: 'Hide', viz: 'Code' } as Record<string, string>)[layout] ||
-            'Show'}
-        </LayoutButton>
+        <StateChart machine={machine} state={state} />
       </AppContext.Provider>
     </StyledApp>
   );

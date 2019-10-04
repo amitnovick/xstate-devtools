@@ -2,7 +2,7 @@
   "name": "xstate-viz-site",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://xstate.js.org/viz",
+  "homepage": ".",
   "dependencies": {
     "@statecharts/xstate-viz": "^0.3.0",
     "@types/jest": "23.3.9",
@@ -16,7 +16,7 @@
   "scripts": {
     "watch": "cra-build-watch --verbose --build-path=extension/devtools/build",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build && node moveBuild.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "react-scripts build",
@@ -37,6 +37,7 @@
     "@types/styled-components": "^4.1.12",
     "cra-build-watch": "^2.0.1",
     "gh-pages": "^2.0.1",
+    "rimraf": "^3.0.0",
     "typescript": "^3.4.5"
   }
 }

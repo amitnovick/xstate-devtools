@@ -19,14 +19,6 @@ export const StateChartVisualization: React.SFC<{
   visible: boolean;
 }> = ({ visible }) => {
   const [transitionCount, setTransitionCount] = useState(0);
-  const [state, setState] = React.useState<{
-    [key: string]: any;
-    preview?: State<any, any>;
-  }>({
-    toggledStates: {},
-    previewEvent: undefined,
-    preview: undefined
-  });
   const { state, machine } = React.useContext(AppContext);
   const svgRef = React.useRef<SVGSVGElement>(null);
   let edges: ReturnType<typeof getEdges> | null;

@@ -1,15 +1,15 @@
 {
   "name": "XState DevTools",
-  "version": "2.2",
+  "version": "0.1",
   "devtools_page": "devtools/devtools.html",
-  "description": "A Chrome extension for inspecting XState machines.",
+  "description": "A Chrome extension for inspecting XState machines running in your app.",
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' 'unsafe-eval' ; object-src 'self'",
   "background": {
     "scripts": ["hot-reload.js", "background.js"],
     "persistent": false
   },
-  "icons": { "48": "assets/icon48.png", "128": "assets/icon128.png" },
+  "icons": { "48": "assets/icon48.png" },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

@@ -128,15 +128,13 @@ export interface StateChartState {
   events: Array<EventRecord>;
 }
 
-export class StateChart extends React.Component<
-  StateChartProps,
-  StateChartState
-> {
-  state: StateChartState = (() => {
+export class StateChart extends React.Component<any, any> {
+  state: any = (() => {
     const machine = this.props.machine;
+    const current = this.props.state;
 
     return {
-      current: machine.initialState,
+      current: current,
       preview: undefined,
       previewEvent: undefined,
       view: 'state',
@@ -174,7 +172,9 @@ export class StateChart extends React.Component<
         }}
       >
         <StateChartContainer />
-        <div style={{ backgroundColor: 'hotpink', visibility: 'hidden' }}>Placeholder</div>
+        <div style={{ backgroundColor: 'hotpink', visibility: 'hidden' }}>
+          Placeholder
+        </div>
         {/* <StyledSidebar>
           <StyledViewTabs>
             {['definition', 'state', 'events'].map(view => {
