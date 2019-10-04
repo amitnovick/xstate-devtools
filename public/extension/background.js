@@ -64,19 +64,21 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     }
     case 'update': {
       const { serviceId, state } = message.payload;
-      const matchingService = tabs[tabId].find(
-        service => service.serviceId === serviceId
-      );
-      if (matchingService !== undefined) {
-        matchingService.state = state;
-        if (tabId in inspectedWindowTabs) {
-          inspectedWindowTabs[tabId].postMessage({
-            type: 'update',
-            payload: {
-              serviceId: serviceId,
-              state: state
-            }
-          });
+      if (tabId in tabs) {
+        const matchingService = tabs[tabId].find(
+          service => service.serviceId === serviceId
+        );
+        if (matchingService !== undefined) {
+          matchingService.state = state;
+          if (tabId in inspectedWindowTabs) {
+            inspectedWindowTabs[tabId].postMessage({
+              type: 'update',
+              payload: {
+                serviceId: serviceId,
+                state: state
+              }
+            });
+          }
         }
       }
       return;
