@@ -14,10 +14,8 @@ import {
 import * as XState from 'xstate';
 import { StateChartContainer, StyledStateChartContainer } from './VizTabs';
 import { StatePanel } from './StatePanel';
-import { EventPanel } from './EventPanel';
 import { raise } from 'xstate/lib/actions';
 import { getEdges } from 'xstate/lib/graph';
-import { notificationsActor } from './Header';
 
 const StyledViewTab = styled.li`
   padding: 0 1rem;
@@ -172,25 +170,6 @@ export class StateChart extends React.Component<any, any> {
         }}
       >
         <StateChartContainer />
-        <div style={{ backgroundColor: 'hotpink', visibility: 'hidden' }}>
-          Placeholder
-        </div>
-        {/* <StyledSidebar>
-          <StyledViewTabs>
-            {['definition', 'state', 'events'].map(view => {
-              return (
-                <StyledViewTab
-                  onClick={() => this.setState({ view })}
-                  key={view}
-                  data-active={this.state.view === view || undefined}
-                >
-                  {view}
-                </StyledViewTab>
-              );
-            })}
-          </StyledViewTabs>
-          {this.renderView()}
-        </StyledSidebar> */}
       </StyledStateChart>
     );
   }

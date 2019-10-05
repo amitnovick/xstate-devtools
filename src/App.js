@@ -1,22 +1,9 @@
-import React, { Component, createContext, useState, useReducer } from 'react';
+import React from 'react';
 import { StateChart } from './index';
 import styled from 'styled-components';
 import queryString from 'query-string';
 
-import { Logo } from './logo';
-import { StyledLayoutButton } from './LayoutButton';
 import AppContext from './AppContext';
-
-export const StyledHeader = styled.header`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: stretch;
-  grid-area: header;
-  padding: 0.5rem 1rem;
-  z-index: 1;
-  white-space: nowrap;
-`;
 
 const StyledApp = styled.main`
   --color-app-background: #fff;
@@ -42,59 +29,7 @@ const StyledApp = styled.main`
   --easing: cubic-bezier(0.5, 0, 0.5, 1);
 
   height: 100%;
-  display: grid;
-  grid-template-areas:
-    'header sidebar'
-    'content content';
-  grid-template-rows: 3rem auto;
-  grid-template-columns: auto var(--sidebar-width);
-  overflow: hidden;
-
-  > ${StyledLayoutButton} {
-    display: inline-block;
-    grid-row: 2;
-    grid-column: -1;
-  }
-
-  @media (max-width: 900px) {
-    grid-template-columns: 50% 50%;
-  }
-
-  &[data-embed] {
-    grid-template-rows: 0 auto;
-
-    > ${StyledHeader} {
-      display: none;
-    }
-  }
-`;
-
-export const StyledLogo = styled(Logo)`
-  height: 2rem;
-`;
-
-export const StyledLink = styled.a`
-  text-decoration: none;
-  color: #57b0ea;
-  text-transform: uppercase;
-  display: block;
-  font-size: 75%;
-  font-weight: bold;
-  margin: 0 0.25rem;
-`;
-
-export const StyledLinks = styled.nav`
-  display: flex;
-  flex-direction: row;
-
-  > ${StyledLink} {
-    line-height: 2rem;
-    margin-left: 1rem;
-  }
-
-  &,
-  &:visited {
-  }
+  overflow: auto;
 `;
 
 const query = queryString.parse(window.location.search);
