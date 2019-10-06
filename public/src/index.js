@@ -8,10 +8,7 @@ import { Machine, State } from 'xstate';
 
 let backgroundPort;
 
-let localServiceId;
-let localMachine;
-let localState;
-let isAlreadyConneted = false;
+let services = [];
 
 const renderDevTools = () => {
   const query = queryString.parse(window.location.search);
@@ -21,7 +18,7 @@ const renderDevTools = () => {
     setTimeout(() => window.close());
   } else {
     ReactDOM.render(
-      <App machine={localMachine} state={localState} />,
+      <App services={services} />,
       document.getElementById('root')
     );
   }
@@ -34,20 +31,50 @@ const init = () => {
     const { type } = message;
     switch (type) {
       case 'connect': {
-        if (isAlreadyConneted === false) {
-          const { serviceId, machine, state } = message.payload;
-          localServiceId = serviceId;
-          localMachine = Machine(JSON.parse(machine));
-          localState = State.create(JSON.parse(state));
-          isAlreadyConneted = true;
-          renderDevTools();
-        }
+        const { services: servicesFromBg } = message.payload;
+        const parsedServicesFromBg = servicesFromBg.map(service => ({
+          serviceId: service.serviceId,
+          machine: Machine(JSON.parse(service.machine)),
+          state: State.create(JSON.parse(service.state))
+        }));
+        services = parsedServicesFromBg.map(service => ({
+          ...service,
+          hasStopped: false
+        }));
+        renderDevTools();
+
         return;
       }
       case 'update': {
         const { state, serviceId } = message.payload;
-        if (isAlreadyConneted && serviceId === localServiceId) {
-          localState = State.create(JSON.parse(state));
+
+        const matchingService = services.find(
+          service => service.serviceId === serviceId
+        );
+        if (matchingService !== undefined) {
+          matchingService.state = State.create(JSON.parse(state));
+          renderDevTools();
+        }
+
+        return;
+      }
+      case 'disconnect': {
+        const { serviceId } = message.payload;
+
+        const matchingService = services.find(
+          service => service.serviceId === serviceId
+        );
+        if (matchingService !== undefined) {
+          services = services.map(service => {
+            if (service.serviceId === serviceId) {
+              return {
+                ...service,
+                hasStopped: true
+              };
+            } else {
+              return service;
+            }
+          });
           renderDevTools();
         }
         return;

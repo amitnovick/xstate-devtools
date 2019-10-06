@@ -15,14 +15,11 @@ chrome.runtime.onConnect.addListener(panelPort => {
   inspectedWindowTabs[tabId] = panelPort;
   if (tabId in tabs && tabs[tabId].length > 0) {
     const services = tabs[tabId];
-    const { serviceId, machine, state } = services[services.length - 1];
 
     panelPort.postMessage({
       type: 'connect',
       payload: {
-        serviceId: serviceId,
-        machine: machine,
-        state: state
+        services: services
       }
     });
   }
@@ -76,6 +73,25 @@ chrome.runtime.onMessage.addListener((message, sender) => {
               payload: {
                 serviceId: serviceId,
                 state: state
+              }
+            });
+          }
+        }
+      }
+      return;
+    }
+    case 'disconnect': {
+      const { serviceId } = message.payload;
+      if (tabId in tabs) {
+        const matchingService = tabs[tabId].find(
+          service => service.serviceId === serviceId
+        );
+        if (matchingService !== undefined) {
+          if (tabId in inspectedWindowTabs) {
+            inspectedWindowTabs[tabId].postMessage({
+              type: 'disconnect',
+              payload: {
+                serviceId: serviceId
               }
             });
           }

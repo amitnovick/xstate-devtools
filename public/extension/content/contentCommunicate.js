@@ -10,5 +10,9 @@ window.addEventListener('message', msg => {
       chrome.runtime.sendMessage(msg.data);
       return;
     }
+    case 'disconnect': {
+      chrome.runtime.sendMessage(msg.data);
+      return;
+    }
   }
 });

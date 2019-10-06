@@ -27,6 +27,14 @@ const __XSTATE_DEVTOOLS_EXTENSION__ = {
             state: JSON.stringify(state)
           }
         });
+      },
+      disconnect: () => {
+        window.postMessage({
+          type: 'disconnect',
+          payload: {
+            serviceId: serviceId
+          }
+        });
       }
     };
   }
