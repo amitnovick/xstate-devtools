@@ -1,6 +1,9 @@
 import './App.css';
 import { App as XStateViz } from '@statecharts/xstate-viz';
 import React from 'react';
+import Dropdown from './Dropdown';
+
+const formatLabel = service => `${service.serviceId} - ${service.machine.id}`;
 
 const App = ({ services }) => {
   const [selectedServiceId, setSelectedServiceId] = React.useState(
@@ -13,26 +16,25 @@ const App = ({ services }) => {
 
   return (
     <>
-      <label htmlFor="services-select">Choose a service: </label>
-      <select
-        name="services"
-        id="services-select"
-        value={selectedServiceId}
-        onChange={({ target }) => setSelectedServiceId(Number(target.value))}
-      >
-        {services.map(service => {
-          if (service.hasStopped && service.serviceId !== selectedServiceId) {
-            return null;
-          } else {
-            return (
-              <option key={service.serviceId} value={service.serviceId}>
-                {service.hasStopped ? 'Stopped: ' : ''}
-                {`${service.serviceId} - ${service.machine.id}`}
-              </option>
-            );
-          }
-        })}
-      </select>
+      <Dropdown
+        selectedItem={{
+          value: selectedServiceId,
+          label: `${selectedService.hasStopped ? 'Stopped: ' : ''}${formatLabel(
+            selectedService
+          )}`
+        }}
+        setSelectedItem={serviceId => setSelectedServiceId(serviceId)}
+        items={services
+          .filter(
+            service =>
+              (service.hasStopped &&
+                service.serviceId !== selectedServiceId) === false
+          )
+          .map(service => ({
+            label: formatLabel(service),
+            value: service.serviceId
+          }))}
+      />
       {services.length > 0 ? (
         selectedService.hasStopped ? (
           <h2>The selected service has been stopped.</h2>
