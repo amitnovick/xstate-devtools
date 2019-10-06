@@ -1,4 +1,5 @@
 //@ts-nocheck
+/*global chrome*/
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
