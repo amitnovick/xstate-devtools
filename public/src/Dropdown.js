@@ -12,6 +12,12 @@ const Dropdown = ({ items, selectedItem, setSelectedItem }) => {
       options={items}
       menuPlacement="top"
       styles={{
+        container: base => ({
+          ...base,
+          width: '50%',
+          margin: '0 auto',
+          border: '1px solid grey'
+        }),
         menu: base => ({
           ...base,
           zIndex: 100
