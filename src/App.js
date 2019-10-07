@@ -71,7 +71,7 @@ export function App({ machine, state, serviceSummary }) {
           serviceSummary={serviceSummary}
         />
         <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
-          {{ full: 'Hide', viz: 'Code' }[layout] || 'Show'}
+          {{ full: 'Hide', viz: 'More' }[layout] || 'Show'}
         </LayoutButton>
       </AppContext.Provider>
     </StyledApp>
