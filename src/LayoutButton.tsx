@@ -33,7 +33,7 @@ export const StyledLayoutButton = styled.button`
   }
 
   [data-layout='viz'] & {
-    right: 100%;
+    /* right: 100%; */
     color: black;
   }
 `;

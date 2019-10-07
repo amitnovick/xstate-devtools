@@ -75,16 +75,16 @@ const StyledPanelAction = styled.div`
 
 export const StatePanel: React.FunctionComponent<{
   state: State<any, any>;
-  service: Interpreter<any>;
-}> = ({ state, service }) => {
+  serviceSummary: any;
+}> = ({ state, serviceSummary }) => {
   const simplifiedState = {
     value: state.value,
     context: state.context
   };
 
   return (
-    <StyledDetails key={service.id} open={true}>
-      <summary>{service.id}</summary>
+    <StyledDetails key={serviceSummary} open={true}>
+      <summary>{serviceSummary}</summary>
       <Field label="state">
         <pre>{JSON.stringify(simplifiedState, null, 2)}</pre>
       </Field>
@@ -106,15 +106,6 @@ export const StatePanel: React.FunctionComponent<{
               })}
             </StyledPanelAction>
           );
-        })}
-      </Field>
-      <Field label="Children">
-        {Array.from((service as any).children.values()).map((child: any, i) => {
-          if (!child.state) {
-            return null;
-          }
-
-          return <StatePanel state={child.state} service={child} key={i} />;
         })}
       </Field>
     </StyledDetails>

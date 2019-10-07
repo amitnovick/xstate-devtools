@@ -42,6 +42,7 @@ const App = ({ services }) => {
           <XStateViz
             machine={selectedService.machine}
             state={selectedService.state}
+            serviceSummary={formatLabel(selectedService)}
           />
         )
       ) : (

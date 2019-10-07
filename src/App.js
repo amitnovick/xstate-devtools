@@ -2,6 +2,7 @@ import React from 'react';
 import { StateChart } from './index';
 import styled from 'styled-components';
 import queryString from 'query-string';
+import { LayoutButton } from './LayoutButton';
 
 import AppContext from './AppContext';
 
@@ -34,13 +35,44 @@ const StyledApp = styled.main`
 
 const query = queryString.parse(window.location.search);
 
-const layout = 'viz';
+function layoutReducer(state, event) {
+  switch (state) {
+    case 'full':
+      switch (event) {
+        case 'TOGGLE':
+          return 'viz';
+        default:
+          return state;
+      }
+    case 'viz':
+      switch (event) {
+        case 'TOGGLE':
+          return 'full';
+        default:
+          return state;
+      }
+    default:
+      return state;
+  }
+}
 
-export function App({ machine, state }) {
+export function App({ machine, state, serviceSummary }) {
+  const [layout, dispatchLayout] = React.useReducer(
+    layoutReducer,
+    query.layout || (!!query.embed ? 'viz' : 'full')
+  );
+
   return (
     <StyledApp data-layout={layout} data-embed={query.embed}>
       <AppContext.Provider value={{ machine: machine, state: state }}>
-        <StateChart machine={machine} state={state} />
+        <StateChart
+          machine={machine}
+          state={state}
+          serviceSummary={serviceSummary}
+        />
+        <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
+          {{ full: 'Hide', viz: 'Code' }[layout] || 'Show'}
+        </LayoutButton>
       </AppContext.Provider>
     </StyledApp>
   );

@@ -104,19 +104,12 @@ export const StyledStateChart = styled.div`
   }
 `;
 
-interface StateChartProps {
-  className?: string;
-  machine: StateNode<any> | string;
-  height?: number | string;
-}
-
 export interface EventRecord {
   event: EventObject;
   time: number;
 }
 export interface StateChartState {
   machine: StateNode<any>;
-  current: State<any, any>;
   preview?: State<any, any>;
   previewEvent?: string;
   view: string; // "state" | "events"
@@ -129,10 +122,8 @@ export interface StateChartState {
 export class StateChart extends React.Component<any, any> {
   state: any = (() => {
     const machine = this.props.machine;
-    const current = this.props.state;
 
     return {
-      current: current,
       preview: undefined,
       previewEvent: undefined,
       view: 'state',
@@ -145,17 +136,18 @@ export class StateChart extends React.Component<any, any> {
       events: []
     };
   })();
-  handleTransition(state: State<any>): void {
-    const formattedEvent = {
-      event: state.event,
-      time: Date.now()
-    };
-    this.setState(
-      { current: state, events: this.state.events.concat(formattedEvent) },
-      () => {}
-    );
+
+  renderView() {
+    const { view, events } = this.state;
+    const { serviceSummary, state: current } = this.props;
+
+    switch (view) {
+      case 'state':
+        return <StatePanel state={current} serviceSummary={serviceSummary} />;
+      default:
+        return null;
+    }
   }
-  svgRef = React.createRef<SVGSVGElement>();
 
   render() {
     const { className } = this.props;
@@ -170,6 +162,22 @@ export class StateChart extends React.Component<any, any> {
         }}
       >
         <StateChartContainer />
+        <StyledSidebar /* TODO: Check that under this works */>
+          <StyledViewTabs>
+            {['state'].map(view => {
+              return (
+                <StyledViewTab
+                  onClick={() => this.setState({ view })}
+                  key={view}
+                  data-active={this.state.view === view || undefined}
+                >
+                  {view}
+                </StyledViewTab>
+              );
+            })}
+          </StyledViewTabs>
+          {this.renderView()}
+        </StyledSidebar>
       </StyledStateChart>
     );
   }
