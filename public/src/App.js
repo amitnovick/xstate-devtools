@@ -19,6 +19,7 @@ const Header = styled.div`
   padding-top: 2px;
   border-bottom: 1px solid #efefef;
   padding-bottom: 2px;
+  padding-left: 1.5rem;
 `;
 
 const App = ({ services }) => {
