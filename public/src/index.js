@@ -35,6 +35,7 @@ const init = () => {
       switch (type) {
         case 'pageFinishedLoading': {
           isPageLoading = false;
+          init();
           return;
         }
       }
@@ -100,10 +101,6 @@ const init = () => {
             <h2 style={{ textAlign: 'center' }}>Resetting...</h2>,
             document.getElementById('root')
           );
-          setTimeout(() => {
-            // Timeout only for a UX for the "Resetting" screen
-            init();
-          }, 500);
           return;
         }
       }

@@ -31,33 +31,11 @@ const App = ({ services }) => {
     service => service.serviceId === selectedServiceId
   );
 
-  console.log(
-    '/src/App.js : selectedServiceId:',
-    selectedServiceId,
-    'selectedService:',
-    selectedService,
-    'services:',
-    services
-  );
   return (
     <>
       <Header>
         <StyledLogo />
-        {selectedService === undefined ? (
-          <Dropdown
-            selectedItem={{
-              value: null,
-              label: 'No service available'
-            }}
-            setSelectedItem={serviceId => setSelectedServiceId(serviceId)}
-            items={[
-              {
-                value: null,
-                label: 'No service available'
-              }
-            ]}
-          />
-        ) : (
+        {selectedService !== undefined ? (
           <Dropdown
             selectedItem={{
               value: selectedServiceId,
@@ -77,6 +55,8 @@ const App = ({ services }) => {
                 value: service.serviceId
               }))}
           />
+        ) : (
+          <h2>No service</h2>
         )}
       </Header>
       {services.length > 0 ? (
