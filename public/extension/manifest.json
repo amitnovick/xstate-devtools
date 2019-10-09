@@ -1,7 +1,7 @@
 {
   "name": "XState DevTools",
   "author": "Amit Novick",
-  "version": "0.4",
+  "version": "0.5",
   "devtools_page": "devtools/devtools.html",
   "description": "A Chrome extension for inspecting XState machines running in your app.",
   "manifest_version": 2,

@@ -5,7 +5,8 @@ import Dropdown from './Dropdown';
 import Logo from './Logo';
 import styled from 'styled-components';
 
-const formatLabel = service => `${service.serviceId} - ${service.machine.id}`;
+const formatLabel = service =>
+  `${service.machine.id} - (uid: ${service.serviceId.slice(0, 3)}...)`;
 
 const StyledLogo = styled(Logo)`
   height: 2rem;
