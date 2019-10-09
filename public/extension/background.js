@@ -15,10 +15,6 @@ const startOrRestartDevTools = tabId => {
     const services = tabs[tabId];
     if (tabId in inspectedWindowTabs) {
       const panelPort = inspectedWindowTabs[tabId];
-      console.log(
-        'startOrRestartDevTools: sending `connect` with `services`:',
-        services
-      );
       panelPort.postMessage({
         type: 'connect',
         payload: {
@@ -31,7 +27,6 @@ const startOrRestartDevTools = tabId => {
 
 // establishing connection with devtools
 chrome.runtime.onConnect.addListener(panelPort => {
-  console.log('runtime.onConnect: tabs: ', tabs);
   const { name: tabId } = panelPort;
   inspectedWindowTabs[tabId] = panelPort;
   startOrRestartDevTools(tabId);
@@ -63,16 +58,13 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   switch (type) {
     case 'connect': {
       const { serviceId, machine, state } = message.payload;
-      console.log('connect: `tabs` before:', tabs);
       const events = [];
       initializeTab({ tabId, serviceId, machine, state, events });
-      console.log('connect: `tabs` after:', tabs);
       startOrRestartDevTools(tabId);
       return;
     }
     case 'update': {
       const { serviceId, state, event } = message.payload;
-      console.log('update: `tabs` before:', tabs);
 
       if (tabId in tabs) {
         const matchingService = tabs[tabId].find(
@@ -81,7 +73,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
         if (matchingService !== undefined) {
           matchingService.state = state;
           matchingService.events.push(event);
-          console.log('update: `tabs` after:', tabs);
 
           if (tabId in inspectedWindowTabs) {
             inspectedWindowTabs[tabId].postMessage({
@@ -99,7 +90,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     }
     case 'disconnect': {
       const { serviceId } = message.payload;
-      console.log('disconnect: `tabs` before:', tabs);
 
       if (tabId in tabs) {
         const matchingService = tabs[tabId].find(
@@ -121,21 +111,29 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 });
 
-const removeTabId = tabId => {
-  delete inspectedWindowTabs[tabId];
-  delete tabs[tabId];
-};
-
 // when tab is closed, remove the tabid from `tabs`
 chrome.tabs.onRemoved.addListener(tabId => {
-  console.log('tabs.onRemoved');
-  removeTabId(tabId);
+  delete inspectedWindowTabs[tabId];
+  delete tabs[tabId];
 });
 
 chrome.tabs.onUpdated.addListener((tabId, { status }) => {
   if (status === 'loading') {
-    console.log('tabs.onUpdated');
-    tabs[tabId] = [];
-    startOrRestartDevTools(tabId);
+    delete tabs[tabId];
+    if (tabId in inspectedWindowTabs) {
+      const panelPort = inspectedWindowTabs[tabId];
+      panelPort.postMessage({
+        type: 'pageStartedLoading'
+      });
+    }
+  } else if (status === 'complete') {
+    if (tabId in inspectedWindowTabs) {
+      const panelPort = inspectedWindowTabs[tabId];
+      panelPort.postMessage({
+        type: 'pageFinishedLoading'
+      });
+      panelPort.disconnect();
+      delete inspectedWindowTabs[tabId];
+    }
   }
 });
