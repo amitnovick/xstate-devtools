@@ -8,7 +8,7 @@ const Dropdown = ({ items, selectedItem, setSelectedItem }) => {
       className="react-select-container"
       classNamePrefix="react-select"
       value={selectedItem}
-      onChange={({ value }) => setSelectedItem(Number(value))}
+      onChange={({ value }) => setSelectedItem(String(value))}
       options={items}
       menuPlacement="top"
       styles={{

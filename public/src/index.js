@@ -33,6 +33,7 @@ const init = () => {
     switch (type) {
       case 'connect': {
         const { services: servicesFromBg } = message.payload;
+        console.log('servicesFromBg:', servicesFromBg);
         const parsedServicesFromBg = servicesFromBg.map(service => {
           const { serviceId, machine, state, events } = service;
 

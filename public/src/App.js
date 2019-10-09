@@ -24,36 +24,60 @@ const Header = styled.div`
 
 const App = ({ services }) => {
   const [selectedServiceId, setSelectedServiceId] = React.useState(
-    services[services.length - 1].serviceId
+    services.length > 0 ? services[services.length - 1].serviceId : null
   );
 
   const selectedService = services.find(
     service => service.serviceId === selectedServiceId
   );
 
+  console.log(
+    '/src/App.js : selectedServiceId:',
+    selectedServiceId,
+    'selectedService:',
+    selectedService,
+    'services:',
+    services
+  );
   return (
     <>
       <Header>
         <StyledLogo />
-        <Dropdown
-          selectedItem={{
-            value: selectedServiceId,
-            label: `${
-              selectedService.hasStopped ? 'Stopped: ' : ''
-            }${formatLabel(selectedService)}`
-          }}
-          setSelectedItem={serviceId => setSelectedServiceId(serviceId)}
-          items={services
-            .filter(
-              service =>
-                (service.hasStopped &&
-                  service.serviceId !== selectedServiceId) === false
-            )
-            .map(service => ({
-              label: formatLabel(service),
-              value: service.serviceId
-            }))}
-        />
+        {selectedService === undefined ? (
+          <Dropdown
+            selectedItem={{
+              value: null,
+              label: 'No service available'
+            }}
+            setSelectedItem={serviceId => setSelectedServiceId(serviceId)}
+            items={[
+              {
+                value: null,
+                label: 'No service available'
+              }
+            ]}
+          />
+        ) : (
+          <Dropdown
+            selectedItem={{
+              value: selectedServiceId,
+              label: `${
+                selectedService.hasStopped ? 'Stopped: ' : ''
+              }${formatLabel(selectedService)}`
+            }}
+            setSelectedItem={serviceId => setSelectedServiceId(serviceId)}
+            items={services
+              .filter(
+                service =>
+                  (service.hasStopped &&
+                    service.serviceId !== selectedServiceId) === false
+              )
+              .map(service => ({
+                label: formatLabel(service),
+                value: service.serviceId
+              }))}
+          />
+        )}
       </Header>
       {services.length > 0 ? (
         selectedService.hasStopped ? (

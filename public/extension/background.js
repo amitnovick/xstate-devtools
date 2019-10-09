@@ -10,20 +10,31 @@ let inspectedWindowTabs = {};
  */
 let tabs = {};
 
+const startOrRestartDevTools = tabId => {
+  if (tabId in tabs) {
+    const services = tabs[tabId];
+    if (tabId in inspectedWindowTabs) {
+      const panelPort = inspectedWindowTabs[tabId];
+      console.log(
+        'startOrRestartDevTools: sending `connect` with `services`:',
+        services
+      );
+      panelPort.postMessage({
+        type: 'connect',
+        payload: {
+          services: services
+        }
+      });
+    }
+  }
+};
+
 // establishing connection with devtools
 chrome.runtime.onConnect.addListener(panelPort => {
+  console.log('runtime.onConnect: tabs: ', tabs);
   const { name: tabId } = panelPort;
   inspectedWindowTabs[tabId] = panelPort;
-  if (tabId in tabs && tabs[tabId].length > 0) {
-    const services = tabs[tabId];
-
-    panelPort.postMessage({
-      type: 'connect',
-      payload: {
-        services: services
-      }
-    });
-  }
+  startOrRestartDevTools(tabId);
 });
 
 const pushOrCreateServicesArray = (tabId, service) => {
@@ -34,6 +45,16 @@ const pushOrCreateServicesArray = (tabId, service) => {
   }
 };
 
+const initializeTab = ({ tabId, serviceId, machine, state, events }) => {
+  const service = {
+    serviceId: serviceId,
+    machine: machine,
+    state: state,
+    events: events
+  };
+  pushOrCreateServicesArray(tabId, service);
+};
+
 // background.js recieves message from content page and forwards it to devTools page
 chrome.runtime.onMessage.addListener((message, sender) => {
   const { id: tabId } = sender.tab;
@@ -42,29 +63,17 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   switch (type) {
     case 'connect': {
       const { serviceId, machine, state } = message.payload;
+      console.log('connect: `tabs` before:', tabs);
       const events = [];
-      const service = {
-        serviceId: serviceId,
-        machine: machine,
-        state: state,
-        events: events
-      };
-      pushOrCreateServicesArray(tabId, service);
-      if (tabId in inspectedWindowTabs) {
-        inspectedWindowTabs[tabId].postMessage({
-          type: 'connect',
-          payload: {
-            serviceId: serviceId,
-            machine: machine,
-            state: state,
-            events: events
-          }
-        });
-      }
+      initializeTab({ tabId, serviceId, machine, state, events });
+      console.log('connect: `tabs` after:', tabs);
+      startOrRestartDevTools(tabId);
       return;
     }
     case 'update': {
       const { serviceId, state, event } = message.payload;
+      console.log('update: `tabs` before:', tabs);
+
       if (tabId in tabs) {
         const matchingService = tabs[tabId].find(
           service => service.serviceId === serviceId
@@ -72,6 +81,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
         if (matchingService !== undefined) {
           matchingService.state = state;
           matchingService.events.push(event);
+          console.log('update: `tabs` after:', tabs);
+
           if (tabId in inspectedWindowTabs) {
             inspectedWindowTabs[tabId].postMessage({
               type: 'update',
@@ -88,6 +99,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     }
     case 'disconnect': {
       const { serviceId } = message.payload;
+      console.log('disconnect: `tabs` before:', tabs);
+
       if (tabId in tabs) {
         const matchingService = tabs[tabId].find(
           service => service.serviceId === serviceId
@@ -108,8 +121,21 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 });
 
-// when tab is closed, remove the tabid from `tabs`
-chrome.tabs.onRemoved.addListener(tabId => {
+const removeTabId = tabId => {
   delete inspectedWindowTabs[tabId];
   delete tabs[tabId];
+};
+
+// when tab is closed, remove the tabid from `tabs`
+chrome.tabs.onRemoved.addListener(tabId => {
+  console.log('tabs.onRemoved');
+  removeTabId(tabId);
+});
+
+chrome.tabs.onUpdated.addListener((tabId, { status }) => {
+  if (status === 'loading') {
+    console.log('tabs.onUpdated');
+    tabs[tabId] = [];
+    startOrRestartDevTools(tabId);
+  }
 });
