@@ -16,6 +16,7 @@ import { StateChartContainer, StyledStateChartContainer } from './VizTabs';
 import { StatePanel } from './StatePanel';
 import { raise } from 'xstate/lib/actions';
 import { getEdges } from 'xstate/lib/graph';
+import { EventPanel } from './EventPanel'; //TODO
 
 const StyledViewTab = styled.li`
   padding: 0 1rem;
@@ -132,18 +133,19 @@ export class StateChart extends React.Component<any, any> {
         typeof this.props.machine === 'string'
           ? this.props.machine
           : `Machine(${JSON.stringify(machine.config, null, 2)})`,
-      toggledStates: {},
-      events: []
+      toggledStates: {}
     };
   })();
 
   renderView() {
-    const { view, events } = this.state;
-    const { serviceSummary, state: current } = this.props;
+    const { view } = this.state;
+    const { serviceSummary, state: current, events } = this.props;
 
     switch (view) {
       case 'state':
         return <StatePanel state={current} serviceSummary={serviceSummary} />;
+      case 'events':
+        return <EventPanel state={current} records={events} />;
       default:
         return null;
     }
@@ -164,7 +166,7 @@ export class StateChart extends React.Component<any, any> {
         <StateChartContainer />
         <StyledSidebar /* TODO: Check that under this works */>
           <StyledViewTabs>
-            {['state'].map(view => {
+            {['state', 'events'].map(view => {
               return (
                 <StyledViewTab
                   onClick={() => this.setState({ view })}

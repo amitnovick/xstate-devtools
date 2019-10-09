@@ -56,7 +56,7 @@ function layoutReducer(state, event) {
   }
 }
 
-export function App({ machine, state, serviceSummary }) {
+export function App({ machine, state, serviceSummary, events }) {
   const [layout, dispatchLayout] = React.useReducer(
     layoutReducer,
     query.layout || (!!query.embed ? 'viz' : 'full')
@@ -69,6 +69,7 @@ export function App({ machine, state, serviceSummary }) {
           machine={machine}
           state={state}
           serviceSummary={serviceSummary}
+          events={events}
         />
         <LayoutButton onClick={() => dispatchLayout('TOGGLE')}>
           {{ full: 'Hide', viz: 'More' }[layout] || 'Show'}

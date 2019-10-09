@@ -33,11 +33,16 @@ const init = () => {
     switch (type) {
       case 'connect': {
         const { services: servicesFromBg } = message.payload;
-        const parsedServicesFromBg = servicesFromBg.map(service => ({
-          serviceId: service.serviceId,
-          machine: Machine(JSON.parse(service.machine)),
-          state: State.create(JSON.parse(service.state))
-        }));
+        const parsedServicesFromBg = servicesFromBg.map(service => {
+          const { serviceId, machine, state, events } = service;
+
+          return {
+            serviceId: serviceId,
+            machine: Machine(JSON.parse(machine)),
+            state: State.create(JSON.parse(state)),
+            events: events.map(event => JSON.parse(event))
+          };
+        });
         services = parsedServicesFromBg.map(service => ({
           ...service,
           hasStopped: false
@@ -47,16 +52,16 @@ const init = () => {
         return;
       }
       case 'update': {
-        const { state, serviceId } = message.payload;
+        const { state, serviceId, event } = message.payload;
 
         const matchingService = services.find(
           service => service.serviceId === serviceId
         );
         if (matchingService !== undefined) {
           matchingService.state = State.create(JSON.parse(state));
+          matchingService.events.push(JSON.parse(event));
           renderDevTools();
         }
-
         return;
       }
       case 'disconnect': {

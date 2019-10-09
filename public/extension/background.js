@@ -6,6 +6,7 @@ let inspectedWindowTabs = {};
  *  `serviceId`: a unique number that identify this service
  *  `machine`: a stringified xstate machine object
  *  `state` : a stringified xstate state object
+ *  `events` : an array of objects with keys: `event`: an Event object, `time`: a number
  */
 let tabs = {};
 
@@ -41,10 +42,12 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   switch (type) {
     case 'connect': {
       const { serviceId, machine, state } = message.payload;
+      const events = [];
       const service = {
         serviceId: serviceId,
         machine: machine,
-        state: state
+        state: state,
+        events: events
       };
       pushOrCreateServicesArray(tabId, service);
       if (tabId in inspectedWindowTabs) {
@@ -53,26 +56,29 @@ chrome.runtime.onMessage.addListener((message, sender) => {
           payload: {
             serviceId: serviceId,
             machine: machine,
-            state: state
+            state: state,
+            events: events
           }
         });
       }
       return;
     }
     case 'update': {
-      const { serviceId, state } = message.payload;
+      const { serviceId, state, event } = message.payload;
       if (tabId in tabs) {
         const matchingService = tabs[tabId].find(
           service => service.serviceId === serviceId
         );
         if (matchingService !== undefined) {
           matchingService.state = state;
+          matchingService.events.push(event);
           if (tabId in inspectedWindowTabs) {
             inspectedWindowTabs[tabId].postMessage({
               type: 'update',
               payload: {
                 serviceId: serviceId,
-                state: state
+                state: state,
+                event: event
               }
             });
           }

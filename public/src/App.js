@@ -63,6 +63,7 @@ const App = ({ services }) => {
             machine={selectedService.machine}
             state={selectedService.state}
             serviceSummary={formatLabel(selectedService)}
+            events={selectedService.events}
           />
         )
       ) : (

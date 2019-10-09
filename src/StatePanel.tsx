@@ -88,26 +88,6 @@ export const StatePanel: React.FunctionComponent<{
       <Field label="state">
         <pre>{JSON.stringify(simplifiedState, null, 2)}</pre>
       </Field>
-      <Field label="actions">
-        {state.actions.map((action, i) => {
-          return (
-            <StyledPanelAction key={i}>
-              {Object.keys(action).map(key => {
-                const value = action[key];
-                if (value === undefined) {
-                  return null;
-                }
-                return (
-                  <React.Fragment key={key}>
-                    <strong>{key}:</strong>
-                    <pre>{JSON.stringify(action[key], null, 2)}</pre>
-                  </React.Fragment>
-                );
-              })}
-            </StyledPanelAction>
-          );
-        })}
-      </Field>
     </StyledDetails>
   );
 };

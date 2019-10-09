@@ -19,12 +19,17 @@ const __XSTATE_DEVTOOLS_EXTENSION__ = {
     });
 
     return {
-      send: state => {
+      send: ({ state, event }) => {
+        const formattedEvent = {
+          event: event,
+          time: Date.now()
+        };
         window.postMessage({
           type: 'update',
           payload: {
             serviceId: serviceId,
-            state: JSON.stringify(state)
+            state: JSON.stringify(state),
+            event: JSON.stringify(formattedEvent)
           }
         });
       },
