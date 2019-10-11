@@ -9,19 +9,19 @@ function uuidv4() {
 }
 
 const __XSTATE_DEVTOOLS_EXTENSION__ = {
-  connect: ({ machine, state }) => {
+  connect: (_, machine) => {
     const serviceId = uuidv4();
     window.postMessage({
       type: 'connect',
       payload: {
         serviceId: serviceId,
         machine: JSON.stringify(machine.config),
-        state: JSON.stringify(state)
+        state: JSON.stringify(machine.initialState)
       }
     });
 
     return {
-      send: ({ state, event }) => {
+      send: (event, state) => {
         const formattedEvent = {
           event: event,
           time: Date.now()
@@ -42,9 +42,10 @@ const __XSTATE_DEVTOOLS_EXTENSION__ = {
             serviceId: serviceId
           }
         });
-      }
+      },
+      init: () => {}
     };
   }
 };
 
-window.__XSTATE_DEVTOOLS_EXTENSION__ = __XSTATE_DEVTOOLS_EXTENSION__;
+window.__REDUX_DEVTOOLS_EXTENSION__ = __XSTATE_DEVTOOLS_EXTENSION__;
