@@ -10,41 +10,52 @@ function uuidv4() {
 
 const __XSTATE_DEVTOOLS_EXTENSION__ = {
   connect: (_, machine) => {
-    const serviceId = uuidv4();
-    window.postMessage({
-      type: 'connect',
-      payload: {
-        serviceId: serviceId,
-        machine: JSON.stringify(machine.config),
-        state: JSON.stringify(machine.initialState)
-      }
-    });
+    if (machine) {
+      const serviceId = uuidv4();
+      window.postMessage({
+        type: 'connect',
+        payload: {
+          serviceId: serviceId,
+          machine: JSON.stringify(machine.config),
+          state: JSON.stringify(machine.initialState)
+        }
+      });
 
-    return {
-      send: (event, state) => {
-        const formattedEvent = {
-          event: event,
-          time: Date.now()
-        };
-        window.postMessage({
-          type: 'update',
-          payload: {
-            serviceId: serviceId,
-            state: JSON.stringify(state),
-            event: JSON.stringify(formattedEvent)
-          }
-        });
-      },
-      disconnect: () => {
-        window.postMessage({
-          type: 'disconnect',
-          payload: {
-            serviceId: serviceId
-          }
-        });
-      },
-      init: () => {}
-    };
+      return {
+        send: (event, state) => {
+          const formattedEvent = {
+            event: event,
+            time: Date.now()
+          };
+          window.postMessage({
+            type: 'update',
+            payload: {
+              serviceId: serviceId,
+              state: JSON.stringify(state),
+              event: JSON.stringify(formattedEvent)
+            }
+          });
+        },
+        disconnect: () => {
+          window.postMessage({
+            type: 'disconnect',
+            payload: {
+              serviceId: serviceId
+            }
+          });
+        },
+        init: () => {}
+      };
+    } else {
+      console.warn(
+        "XState DevTools browser extension: This application doesn't appear to be using a compatible XState package version."
+      );
+      return {
+        send: () => {},
+        disconnect: () => {},
+        init: () => {}
+      };
+    }
   }
 };
 
