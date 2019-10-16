@@ -8,53 +8,66 @@ function uuidv4() {
   );
 }
 
+const uselessInterface = {
+  send: () => {},
+  disconnect: () => {},
+  init: () => {}
+};
+
 const __XSTATE_DEVTOOLS_EXTENSION__ = {
   connect: (_, machine) => {
     if (machine) {
-      const serviceId = uuidv4();
-      window.postMessage({
-        type: 'connect',
-        payload: {
-          serviceId: serviceId,
-          machine: JSON.stringify(machine.config),
-          state: JSON.stringify(machine.initialState)
-        }
-      });
+      try {
+        const serviceId = uuidv4();
+        window.postMessage({
+          type: 'connect',
+          payload: {
+            serviceId: serviceId,
+            machine: JSON.stringify(machine.config),
+            state: JSON.stringify(machine.initialState)
+          }
+        });
 
-      return {
-        send: (event, state) => {
-          const formattedEvent = {
-            event: event,
-            time: Date.now()
-          };
-          window.postMessage({
-            type: 'update',
-            payload: {
-              serviceId: serviceId,
-              state: JSON.stringify(state),
-              event: JSON.stringify(formattedEvent)
-            }
-          });
-        },
-        disconnect: () => {
-          window.postMessage({
-            type: 'disconnect',
-            payload: {
-              serviceId: serviceId
-            }
-          });
-        },
-        init: () => {}
-      };
+        return {
+          send: (event, state) => {
+            const formattedEvent = {
+              event: event,
+              time: Date.now()
+            };
+            window.postMessage({
+              type: 'update',
+              payload: {
+                serviceId: serviceId,
+                state: JSON.stringify(state),
+                event: JSON.stringify(formattedEvent)
+              }
+            });
+          },
+          disconnect: () => {
+            window.postMessage({
+              type: 'disconnect',
+              payload: {
+                serviceId: serviceId
+              }
+            });
+          },
+          init: () => {}
+        };
+      } catch (error) {
+        console.warn(
+          `XState DevTools browser extension: Caught error. 
+          Name: ${error.name}
+          Message: ${error.message}
+          Stack: ${error.stack}
+          `
+        );
+        return uselessInterface;
+      }
     } else {
       console.warn(
-        "XState DevTools browser extension: This application doesn't appear to be using a compatible XState package version."
+        "XState DevTools browser extension: This application doesn't appear to be using a compatible XState package version. Please install XState version 4.7.0+"
       );
-      return {
-        send: () => {},
-        disconnect: () => {},
-        init: () => {}
-      };
+      return uselessInterface;
     }
   }
 };
