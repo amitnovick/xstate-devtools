@@ -2,13 +2,26 @@ A browser extension for inspecting XState machines running in your app.
 
 Powered by the awesome [XState-Viz project](https://github.com/statecharts/xstate-viz) by [David Khourshid](https://github.com/davidkpiano).
 
-**Note**: The extension requires XState version v4.7.0 or newer. For now, you can get it via:
+**Note**: The extension requires XState version v4.7.0 or newer:
+
+# Usage
 
 ```sh
-npm install xstate@next
+npm install xstate @^4.7
 ```
 
-# Quick Start
+In every place where a service is started, pass the Interpreter option `devTools: true`:
+
+```js
+interpret(machine, { devTools: true }); // with `interpret` from xstate
+
+useMachine(machine, { devTools: true }); // or with `useMachine` from @xstate/react
+```
+
+Now start the app and open the DevTools (Ctrl+Shift+I), in the XState DevTools extension panel:
+![XState DevTools extension panel in the DevTools](docs/devtools-panel-instruction.png)
+
+# Demo
 
 If you wanna play around with it as easily as possible, I would suggest:
 
