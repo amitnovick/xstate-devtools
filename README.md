@@ -4,6 +4,13 @@ Powered by the awesome [XState-Viz project](https://github.com/statecharts/xstat
 
 **Note**: The extension requires XState version v4.7.0 or newer:
 
+# Download
+
+| Browser | Download                                                                                                                                                                                                                                                                          |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chrome  | <a href='https://chrome.google.com/webstore/detail/xstate-devtools/aamnodipnlopbknpklfoabalmobheehc'><img alt='Get extension for Google Chrome' width="134px" src='https://raw.githubusercontent.com/amitnovick/xstate-devtools/master/docs/badge-google-chrome-340x96.png'/></a> |
+| Firefox | Sometime soon™!                                                                                                                                                                                                                                                                   |
+
 # Usage
 
 ```sh
@@ -30,13 +37,6 @@ If you wanna play around with it as easily as possible, I would suggest:
 3. Make sure to click **Open in New Window**
 4. Open up the DevTools and pick the XState DevTools panel
 5. Let me know how it goes! 👍
-
-# Download
-
-| Browser | Download                                                                                                                                                                                                                                                                          |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chrome  | <a href='https://chrome.google.com/webstore/detail/xstate-devtools/aamnodipnlopbknpklfoabalmobheehc'><img alt='Get extension for Google Chrome' width="134px" src='https://raw.githubusercontent.com/amitnovick/xstate-devtools/master/docs/badge-google-chrome-340x96.png'/></a> |
-| Firefox | Sometime soon™!                                                                                                                                                                                                                                                                   |
 
 # Development
 
