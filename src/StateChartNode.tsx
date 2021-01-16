@@ -626,9 +626,9 @@ export class StateChartNode extends React.Component<
             if (typeof delay === 'string') {
               const delayExpr = stateNode.machine.options.delays[delay];
               delay =
-                typeof delayExpr === 'number'
-                  ? delayExpr
-                  : delayExpr(current.context, current.event);
+                typeof delayExpr === 'function'
+                  ? delayExpr(current.context, current.event)
+                  : Number(delay) || 0;
             }
 
             const isTransient = ownEvent === '';
